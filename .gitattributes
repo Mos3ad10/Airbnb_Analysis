@@ -4,9 +4,14 @@
 *.sql text eol=lf
 *.json text eol=lf
 *.ipynb text eol=lf
+*.pbip text eol=lf
+*.pbir text eol=lf
+*.pbism text eol=lf
+*.tmdl text eol=lf
 
 *.pbix binary
 *.zip binary
 *.png binary
+*.jpg binary
 *.xlsx binary
 *.dacpac binary

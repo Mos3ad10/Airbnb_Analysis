@@ -1,0 +1,46 @@
+table 'gold DimLocation'
+	lineageTag: 4ddabad2-4659-47af-ad63-e047e4d5688a
+
+	column LocationKey
+		dataType: int64
+		formatString: 0
+		lineageTag: c38ac8d7-2cac-4a06-89d1-20a06024957a
+		summarizeBy: none
+		sourceColumn: LocationKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CityName
+		dataType: string
+		lineageTag: 6db42997-1a68-423d-9763-1d53830386a1
+		summarizeBy: none
+		sourceColumn: CityName
+
+		annotation SummarizationSetBy = Automatic
+
+	column TimePeriod
+		dataType: string
+		lineageTag: 69c513b9-f77a-4420-a9db-4680f898c0af
+		summarizeBy: none
+		sourceColumn: TimePeriod
+
+		annotation SummarizationSetBy = Automatic
+
+	column City =
+			UPPER(LEFT('gold DimLocation'[CityName], 1))
+			& MID('gold DimLocation'[CityName], 2, LEN('gold DimLocation'[CityName]))
+		dataType: string
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000022
+		summarizeBy: none
+
+	partition 'gold DimLocation' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".\SQLEXPRESS", "DataWareHouse"),
+				    gold_DimLocation = Source{[Schema="gold",Item="DimLocation"]}[Data]
+				in
+				    gold_DimLocation
+
+	annotation PBI_ResultType = Table
+

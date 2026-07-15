@@ -1,0 +1,60 @@
+table 'gold DimHostProfile'
+	lineageTag: c39e7072-1aa1-4f3f-af58-c7a558b197f6
+
+	measure Measure
+		lineageTag: a936e60e-b244-4684-8427-b042e222a93b
+
+		annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+	column HostProfileKey
+		dataType: int64
+		formatString: 0
+		lineageTag: cd16fdf7-103d-4084-b659-c4bf509a990c
+		summarizeBy: none
+		sourceColumn: HostProfileKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsSuperhost
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 9443c001-8367-47f0-a62c-56e4ee10c6d4
+		summarizeBy: none
+		sourceColumn: IsSuperhost
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsMultiListing
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 88be31c6-84fb-4d1c-8948-7bd53e524146
+		summarizeBy: none
+		sourceColumn: IsMultiListing
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsBusiness
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 06702604-47ab-441f-b845-3010b34e68a3
+		summarizeBy: none
+		sourceColumn: IsBusiness
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Host Listing Type' = IF('gold DimHostProfile'[IsMultiListing], "Multi-listing", "Individual")
+		dataType: string
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000018
+		summarizeBy: none
+
+	partition 'gold DimHostProfile' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".\SQLEXPRESS", "DataWareHouse"),
+				    gold_DimHostProfile = Source{[Schema="gold",Item="DimHostProfile"]}[Data]
+				in
+				    gold_DimHostProfile
+
+	annotation PBI_ResultType = Table
+

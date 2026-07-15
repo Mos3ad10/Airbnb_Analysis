@@ -1,0 +1,395 @@
+table 'gold FactListings'
+	lineageTag: b0148b1f-ca3e-4961-a4f9-294e423bc121
+
+	measure 'Total Listings' = COUNT('gold FactListings'[ListingSK])
+		formatString: 0
+		lineageTag: ca474c91-28bd-42a1-8251-817d980ae960
+
+	measure 'Avg Price' = AVERAGE('gold FactListings'[PriceEUR])
+		lineageTag: 15a783dc-99bf-479a-99ac-de0474b06320
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Satisfaction' = AVERAGE('gold FactListings'[GuestSatisfactionScore])
+		lineageTag: 40d8129b-542b-47e0-ab28-de0ec2e7c98b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Distance to City Center' =
+			
+			FORMAT(AVERAGE('gold FactListings'[DistanceToCityCenterKM]), "0.00") & " KM"
+		lineageTag: d2702f1b-b775-4eaf-9387-874eeb2170c5
+
+	measure 'Avg Price EUR' = [Avg Price]
+		formatString: €#,0.00
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000001
+
+	measure 'Avg Satisfaction %' = DIVIDE([Avg Satisfaction], 100)
+		formatString: 0.00%
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000002
+
+	measure 'Avg Distance KM' = AVERAGE('gold FactListings'[DistanceToCityCenterKM])
+		formatString: 0.00 "KM"
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000003
+
+	measure 'Avg Latitude' = AVERAGE('gold FactListings'[Latitude])
+		formatString: 0.0000
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000004
+
+	measure 'Avg Longitude' = AVERAGE('gold FactListings'[Longitude])
+		formatString: 0.0000
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000005
+
+	measure 'Multi-Listing Share' =
+			
+			VAR MultiListings =
+			    CALCULATE(
+			        [Total Listings],
+			        REMOVEFILTERS('gold DimHostProfile'[IsMultiListing], 'gold DimHostProfile'[Host Listing Type]),
+			        'gold DimHostProfile'[IsMultiListing] = TRUE()
+			    )
+			VAR AllListings =
+			    CALCULATE(
+			        [Total Listings],
+			        REMOVEFILTERS('gold DimHostProfile'[IsMultiListing], 'gold DimHostProfile'[Host Listing Type])
+			    )
+			RETURN DIVIDE(MultiListings, AllListings)
+		formatString: 0.00%
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000006
+
+	measure 'Avg Price Near Center' =
+			CALCULATE(
+			    [Avg Price],
+			    KEEPFILTERS('gold FactListings'[DistanceToCityCenterKM] <= 2)
+			)
+		formatString: €#,0.00
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000007
+
+	measure 'Avg Price Outside' =
+			CALCULATE(
+			    [Avg Price],
+			    KEEPFILTERS('gold FactListings'[DistanceToCityCenterKM] > 5)
+			)
+		formatString: €#,0.00
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000008
+
+	measure 'Highest Avg City Price' =
+			MAXX(
+			    ALLSELECTED('gold DimLocation'[CityName]),
+			    CALCULATE([Avg Price])
+			)
+		formatString: €#,0.00
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000009
+
+	measure 'Lowest Avg City Price' =
+			MINX(
+			    ALLSELECTED('gold DimLocation'[CityName]),
+			    CALCULATE([Avg Price])
+			)
+		formatString: €#,0.00
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000010
+
+	measure 'Highest Avg City' =
+			VAR CityTable =
+			    ADDCOLUMNS(
+			        ALLSELECTED('gold DimLocation'[City]),
+			        "@Price", CALCULATE([Avg Price])
+			    )
+			RETURN
+			    CONCATENATEX(
+			        TOPN(1, CityTable, [@Price], DESC, 'gold DimLocation'[City], ASC),
+			        'gold DimLocation'[City],
+			        ", "
+			    )
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000011
+
+	measure 'Lowest Avg City' =
+			VAR CityTable =
+			    ADDCOLUMNS(
+			        ALLSELECTED('gold DimLocation'[City]),
+			        "@Price", CALCULATE([Avg Price])
+			    )
+			RETURN
+			    CONCATENATEX(
+			        TOPN(1, CityTable, [@Price], ASC, 'gold DimLocation'[City], ASC),
+			        'gold DimLocation'[City],
+			        ", "
+			    )
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000012
+
+	measure 'Most Common Room Type' =
+			VAR RoomTable =
+			    ADDCOLUMNS(
+			        VALUES('gold DimRoom'[RoomType]),
+			        "@Listings", CALCULATE([Total Listings])
+			    )
+			RETURN
+			    CONCATENATEX(
+			        TOPN(1, RoomTable, [@Listings], DESC, 'gold DimRoom'[RoomType], ASC),
+			        'gold DimRoom'[RoomType],
+			        ", "
+			    )
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000013
+
+	measure 'City Summary' =
+			FORMAT([Total Listings], "#,0") & " listings"
+			& UNICHAR(10) & FORMAT([Avg Price], "€#,0") & " avg/night"
+			& UNICHAR(10) & FORMAT([Avg Satisfaction %], "0.0%") & " satisfaction"
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000023
+
+	measure 'Insight Top Cities' =
+			VAR CityTable =
+			    ADDCOLUMNS(
+			        ALLSELECTED('gold DimLocation'[City]),
+			        "@Listings", CALCULATE([Total Listings])
+			    )
+			VAR Leaders =
+			    CONCATENATEX(
+			        TOPN(2, CityTable, [@Listings], DESC, 'gold DimLocation'[City], ASC),
+			        'gold DimLocation'[City],
+			        " and "
+			    )
+			RETURN Leaders & " have the highest listing volume."
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000014
+
+	measure 'Insight Central Pricing' =
+			"Central listings average " & FORMAT([Avg Price Near Center], "€#,0")
+			& " versus " & FORMAT([Avg Price Outside], "€#,0") & " beyond 5 km."
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000015
+
+	measure 'Insight Room Premium' =
+			VAR RoomTable =
+			    ADDCOLUMNS(
+			        ALLSELECTED('gold DimRoom'[RoomType]),
+			        "@Price", CALCULATE([Avg Price])
+			    )
+			VAR TopRoom =
+			    CONCATENATEX(
+			        TOPN(1, RoomTable, [@Price], DESC, 'gold DimRoom'[RoomType], ASC),
+			        'gold DimRoom'[RoomType],
+			        ", "
+			    )
+			RETURN TopRoom & " commands the highest average nightly price."
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000016
+
+	measure 'Insight Best Value' =
+			VAR CityTable =
+			    ADDCOLUMNS(
+			        ALLSELECTED('gold DimLocation'[City]),
+			        "@Price", CALCULATE([Avg Price]),
+			        "@Satisfaction", CALCULATE([Avg Satisfaction]),
+			        "@Score", DIVIDE(CALCULATE([Avg Satisfaction]), CALCULATE([Avg Price]))
+			    )
+			VAR BestCity =
+			    TOPN(1, CityTable, [@Score], DESC, 'gold DimLocation'[City], ASC)
+			RETURN
+			    CONCATENATEX(BestCity, 'gold DimLocation'[City], ", ")
+			    & " offers strong satisfaction for about "
+			    & FORMAT(MAXX(BestCity, [@Price]), "€#,0") & " per night."
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000017
+
+	column ListingSK
+		dataType: string
+		lineageTag: 207906c4-f1d3-41dd-abc5-f8d5f7ac7eb1
+		summarizeBy: none
+		sourceColumn: ListingSK
+
+		annotation SummarizationSetBy = Automatic
+
+	column LocationKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 64497eac-019d-4784-97da-e41c5c75a766
+		summarizeBy: none
+		sourceColumn: LocationKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column RoomKey
+		dataType: int64
+		formatString: 0
+		lineageTag: ce6941e0-00da-41df-ad8b-e9f98192daf1
+		summarizeBy: none
+		sourceColumn: RoomKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column HostProfileKey
+		dataType: int64
+		formatString: 0
+		lineageTag: ed1c499f-2141-453a-838f-e8a39fa50c1e
+		summarizeBy: none
+		sourceColumn: HostProfileKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsMissingCriticalData
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 86470cf7-e240-4d85-a089-ee94fc8fdd70
+		summarizeBy: none
+		sourceColumn: IsMissingCriticalData
+
+		annotation SummarizationSetBy = Automatic
+
+	column PriceEUR
+		dataType: double
+		lineageTag: 1c5b8927-39a4-4ca3-bc65-a17e65e6fdb2
+		summarizeBy: sum
+		sourceColumn: PriceEUR
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PriceEUR_Normalized
+		dataType: double
+		lineageTag: c05885c0-85b1-4757-8e25-43bdd643de8b
+		summarizeBy: sum
+		sourceColumn: PriceEUR_Normalized
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PersonCapacity
+		dataType: int64
+		formatString: 0
+		lineageTag: 1d18d490-fc1f-4214-853a-847962e6adb5
+		summarizeBy: sum
+		sourceColumn: PersonCapacity
+
+		annotation SummarizationSetBy = Automatic
+
+	column Bedrooms
+		dataType: int64
+		formatString: 0
+		lineageTag: 9a6e5643-faf6-4ec2-94a6-a2cd29fc68fd
+		summarizeBy: sum
+		sourceColumn: Bedrooms
+
+		annotation SummarizationSetBy = Automatic
+
+	column CleanlinessRating
+		dataType: int64
+		formatString: 0
+		lineageTag: a3508400-b9df-41e2-a091-d29af1f4fc63
+		summarizeBy: sum
+		sourceColumn: CleanlinessRating
+
+		annotation SummarizationSetBy = Automatic
+
+	column GuestSatisfactionScore
+		dataType: int64
+		formatString: 0
+		lineageTag: b7adf8b3-8499-465b-b2c5-9fe5292781da
+		summarizeBy: sum
+		sourceColumn: GuestSatisfactionScore
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistanceToCityCenterKM
+		dataType: double
+		lineageTag: 37b2a312-9142-41f6-94a2-d83c1448fa83
+		summarizeBy: sum
+		sourceColumn: DistanceToCityCenterKM
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DistanceToMetroKM
+		dataType: double
+		lineageTag: cd151967-a682-4e2d-a7c7-5c92c1b76d4e
+		summarizeBy: sum
+		sourceColumn: DistanceToMetroKM
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column AttractionIndexNorm
+		dataType: double
+		lineageTag: 25246703-d8ca-419e-afd9-2f04ce1d5488
+		summarizeBy: sum
+		sourceColumn: AttractionIndexNorm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column RestaurantIndexNorm
+		dataType: double
+		lineageTag: 46784d8d-3475-47c3-a013-620754a7e3b8
+		summarizeBy: sum
+		sourceColumn: RestaurantIndexNorm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Latitude
+		dataType: double
+		lineageTag: 3e7e83bd-2ef5-4aab-b1d4-2c3a253b7986
+		summarizeBy: sum
+		sourceColumn: Latitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Longitude
+		dataType: double
+		lineageTag: fb402aca-bb9f-47f2-b965-e8a1587b247c
+		summarizeBy: sum
+		sourceColumn: Longitude
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Price Band' =
+			SWITCH(
+			    TRUE(),
+			    'gold FactListings'[PriceEUR] < 150, "Under €150",
+			    'gold FactListings'[PriceEUR] < 250, "€150–249",
+			    'gold FactListings'[PriceEUR] < 400, "€250–399",
+			    "€400+"
+			)
+		dataType: string
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000019
+		summarizeBy: none
+
+	column 'Distance Band' =
+			SWITCH(
+			    TRUE(),
+			    'gold FactListings'[DistanceToCityCenterKM] <= 2, "Within 2 km",
+			    'gold FactListings'[DistanceToCityCenterKM] <= 5, "2–5 km",
+			    "Beyond 5 km"
+			)
+		dataType: string
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000020
+		summarizeBy: none
+
+	column 'Satisfaction Band' =
+			SWITCH(
+			    TRUE(),
+			    'gold FactListings'[GuestSatisfactionScore] < 90, "Below 90",
+			    'gold FactListings'[GuestSatisfactionScore] < 95, "90–94",
+			    "95+"
+			)
+		dataType: string
+		lineageTag: d9b7c0a1-1010-4c01-9001-000000000021
+		summarizeBy: none
+
+	partition 'gold FactListings' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".\SQLEXPRESS", "DataWareHouse"),
+				    gold_FactListings = Source{[Schema="gold",Item="FactListings"]}[Data]
+				in
+				    gold_FactListings
+
+	annotation PBI_ResultType = Table
+

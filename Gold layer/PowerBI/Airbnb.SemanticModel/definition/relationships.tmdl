@@ -1,0 +1,18 @@
+relationship 0492b4f9-09c2-424a-9a21-f5f5d4c8026d
+	fromColumn: 'gold FactListings'.LocationKey
+	toColumn: 'gold DimLocation'.LocationKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship c597faba-cd58-463b-80ca-1085718d96b2
+	fromColumn: 'gold FactListings'.HostProfileKey
+	toColumn: 'gold DimHostProfile'.HostProfileKey
+
+	annotation PBI_IsFromSource = FS
+
+relationship cc37b229-ddf1-4c81-a63f-e12ec89a2b88
+	fromColumn: 'gold FactListings'.RoomKey
+	toColumn: 'gold DimRoom'.RoomKey
+
+	annotation PBI_IsFromSource = FS
+

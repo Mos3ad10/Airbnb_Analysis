@@ -1,0 +1,49 @@
+table 'gold DimRoom'
+	lineageTag: f42600d3-cc91-43dc-b8a1-2f782fc0c609
+
+	column RoomKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 0aa36123-1b40-4be1-af39-9937ea628472
+		summarizeBy: none
+		sourceColumn: RoomKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column RoomType
+		dataType: string
+		lineageTag: dd4b6791-7db7-4d61-85bc-c4d8967e3832
+		summarizeBy: none
+		sourceColumn: RoomType
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsShared
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 69783f7f-c641-4cd0-9035-95a909d31f2e
+		summarizeBy: none
+		sourceColumn: IsShared
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsPrivate
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: a8d74b98-e580-4b18-a280-0a4c283ce492
+		summarizeBy: none
+		sourceColumn: IsPrivate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'gold DimRoom' = m
+		mode: import
+		source =
+				let
+				    Source = Sql.Database(".\SQLEXPRESS", "DataWareHouse"),
+				    gold_DimRoom = Source{[Schema="gold",Item="DimRoom"]}[Data]
+				in
+				    gold_DimRoom
+
+	annotation PBI_ResultType = Table
+
