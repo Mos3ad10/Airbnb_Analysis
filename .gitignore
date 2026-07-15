@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.env
+
+# Logs and temp files
+*.log
+tmp/
+temp/
+cache/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local credentials
+*.key
+*.pem
+secrets.json
+credentials.json
+
+# Local SQL Server/database backups
+*.bak
+*.mdf
+*.ldf
