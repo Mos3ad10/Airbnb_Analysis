@@ -14,10 +14,12 @@ An end-to-end Airbnb analytics project that organizes raw European city listing 
 ```text
 .
 |-- Bronze layer/                    Raw city CSV files
-|-- Silver layer/                    Cleaned/intermediate layer placeholder
+|-- Silver layer/                    Cleaned SQL Server Silver export
 |-- Silver layer (scraped)/          Scraped/enriched layer placeholder
 |-- Gold layer/
+|   |-- Database/                    SQL Server DACPAC package
 |   |-- SQL/                         Bronze, Silver, and Gold SQL scripts
+|   |-- Star Schema/                 Exported Gold dimension and fact CSV files
 |   |-- PowerBI/                     PBIX, PBIP zip, and dashboard screenshots
 |-- scripts/                         Airbnb scraping notebook
 |-- README.md
@@ -53,6 +55,10 @@ The SQL scripts are in `Gold layer/SQL`:
 
 The scripts create a SQL Server database named `DataWareHouse` with `bronze`, `silver`, and `gold` schemas. The Gold layer includes dimension and fact tables for dashboard reporting.
 
+The SQL Server Silver export is included here:
+
+- `Silver layer/silver_airbnb_listings.csv`
+
 The SQL Server database package is included here:
 
 - `Gold layer/Database/DataWareHouse.dacpac`
@@ -64,6 +70,13 @@ The project also includes the final flat Gold export:
 - `Gold layer/gold_flat.csv`
 
 This file is the combined dashboard-ready dataset with listing, city, room, host, price, rating, distance, and coordinate fields.
+
+The exported Gold star schema CSV files are included here:
+
+- `Gold layer/Star Schema/DimLocation.csv`
+- `Gold layer/Star Schema/DimRoom.csv`
+- `Gold layer/Star Schema/DimHostProfile.csv`
+- `Gold layer/Star Schema/FactListings.csv`
 
 ## Power BI
 
