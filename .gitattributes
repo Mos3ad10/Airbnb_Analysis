@@ -9,3 +9,4 @@
 *.zip binary
 *.png binary
 *.xlsx binary
+*.dacpac binary

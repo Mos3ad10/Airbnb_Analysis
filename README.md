@@ -53,6 +53,12 @@ The SQL scripts are in `Gold layer/SQL`:
 
 The scripts create a SQL Server database named `DataWareHouse` with `bronze`, `silver`, and `gold` schemas. The Gold layer includes dimension and fact tables for dashboard reporting.
 
+The SQL Server database package is included here:
+
+- `Gold layer/Database/DataWareHouse.dacpac`
+
+Use the DACPAC to publish or restore the warehouse schema in SQL Server tooling such as SQL Server Management Studio or SqlPackage.
+
 The project also includes the final flat Gold export:
 
 - `Gold layer/gold_flat.csv`
