@@ -10,10 +10,6 @@ Gold layer/
 |   |-- Airbnb.pbip
 |   |-- Airbnb.Report/
 |   |-- Airbnb.SemanticModel/
-|   |-- screenshots/
-|       |-- Screen 1 · Airbnb Market Overview.png
-|       |-- Screen 2 · City Performance.png
-|       |-- Screen 3 · Pricing Analysis.png
 ```
 
 ## Preview
