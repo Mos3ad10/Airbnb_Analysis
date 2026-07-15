@@ -1,0 +1,4 @@
+﻿"RoomKey","RoomType","IsShared","IsPrivate"
+"1","Shared room","True","False"
+"2","Entire home/apt","False","False"
+"3","Private room","False","True"
