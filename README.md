@@ -15,7 +15,6 @@ An end-to-end Airbnb analytics project that organizes raw European city listing 
 .
 |-- Bronze layer/                    Raw city CSV files
 |-- Silver layer/                    Cleaned SQL Server Silver export
-|-- Silver layer (scraped)/          Scraped/enriched layer placeholder
 |-- Gold layer/
 |   |-- Database/                    SQL Server DACPAC package
 |   |-- SQL/                         Bronze, Silver, and Gold SQL scripts
