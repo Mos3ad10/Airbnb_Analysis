@@ -53,6 +53,12 @@ The SQL scripts are in `Gold layer/SQL`:
 
 The scripts create a SQL Server database named `DataWareHouse` with `bronze`, `silver`, and `gold` schemas. The Gold layer includes dimension and fact tables for dashboard reporting.
 
+The project also includes the final flat Gold export:
+
+- `Gold layer/gold_flat.csv`
+
+This file is the combined dashboard-ready dataset with listing, city, room, host, price, rating, distance, and coordinate fields.
+
 ## Power BI
 
 Power BI assets are in `Gold layer/PowerBI`:
